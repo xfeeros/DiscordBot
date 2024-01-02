@@ -32,7 +32,8 @@ public class Program
 
     public async Task MainAsync()
     {
-        string token = "YOUR_BOT_TOKEN_HERE";
+        //string token = "Token.txt";
+        string token = System.IO.File.ReadAllText("Token.txt");
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
         await Task.Delay(-1);
