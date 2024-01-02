@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 public class Program
 {
-    string token = System.IO.File.ReadAllText("config.txt");
+    string token = System.IO.File.ReadAllText("Token.txt");
     private readonly DiscordSocketClient _client;
 
     public static void Main(string[] args)
