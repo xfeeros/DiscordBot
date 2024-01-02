@@ -1,9 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using dotenv.net;
+using Serilog;
 
 public class Program
 {
-    string token = System.IO.File.ReadAllText("config.txt");
     private readonly DiscordSocketClient _client;
 
     public static void Main(string[] args)
@@ -15,39 +16,45 @@ public class Program
 
         _client.Log += LogAsync;
         _client.MessageReceived += HandleCommandAsync;
+        _client.UserVoiceStateUpdated += HandleVoiceStatusUpdate;
+ 
     }
 
     private async Task LogAsync(LogMessage log)
     {
         Console.WriteLine(log);
+        
     }
 
     public async Task MainAsync()
     {
-        string token = System.IO.File.ReadAllText("Token.txt");
+        DotEnv.Load();
+
+        var config = DotEnv.Read();
+        string token = config["TOKEN"];
+
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
         await Task.Delay(-1);
     }
 
-    private async Task HandleCommandAsync(SocketMessage messageParam)
+    private Task HandleVoiceStatusUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
+    {
+        if (state.ToString() == "Unknown")
+        {
+            Console.WriteLine($"User: {user.Username} joined to {state2}");
+        } else
+        {
+            Console.WriteLine($"User: {user.Username} left from {state}");
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    private Task HandleCommandAsync(SocketMessage messageParam)
     {
         var message = messageParam as SocketUserMessage;
-        if (message == null) return;
-
-        if (message.Content == "!join")
-        {
-            var user = message.Author as SocketGuildUser;
-            var voiceChannel = user.VoiceChannel;
-            if (voiceChannel != null)
-            {
-                var audioClient = await voiceChannel.ConnectAsync();
-                await message.Channel.SendMessageAsync("Присоединился к голосовому каналу!");
-            }
-            else
-            {
-                await message.Channel.SendMessageAsync("Вы должны находиться в голосовом канале, чтобы я мог присоединиться!");
-            }
-        }
+        Console.WriteLine(message.Content);
+        return Task.CompletedTask;
     }
 }
