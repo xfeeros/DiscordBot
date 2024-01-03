@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 public class Program
 {
@@ -12,6 +13,11 @@ public class Program
 
     public Program()
     {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .CreateLogger();
+
         _client = new DiscordSocketClient();
         _client.Log += LogAsync;
         _client.Ready += ReadyAsync;
@@ -20,19 +26,18 @@ public class Program
 
     private Task LogAsync(LogMessage log)
     {
-        Console.WriteLine(log);
+        Log.Debug(log.Message);
         return Task.CompletedTask;
     }
 
     private Task ReadyAsync()
     {
-        Console.WriteLine("Bot is connected!");
+        Log.Information("Bot is connected!");
         return Task.CompletedTask;
     }
 
     public async Task MainAsync()
     {
-        //string token = "Token.txt";
         string token = System.IO.File.ReadAllText("Token.txt");
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
@@ -41,6 +46,8 @@ public class Program
 
     private async Task MessageReceivedAsync(SocketMessage message)
     {
+        Log.Information($"Received message: {message.Content} from {message.Author.Username}");
+
         if (message.Content == "!join")
         {
             if (message.Author is SocketGuildUser user)
@@ -49,11 +56,11 @@ public class Program
                 if (voiceChannel != null)
                 {
                     var audioClient = await voiceChannel.ConnectAsync();
-                    await message.Channel.SendMessageAsync("Присоединился к голосовому каналу!");
+                    await message.Channel.SendMessageAsync("Joined the voice channel!");
                 }
                 else
                 {
-                    await message.Channel.SendMessageAsync("Вы должны находиться в голосовом канале, чтобы я мог присоединиться!");
+                    await message.Channel.SendMessageAsync("You must be in a voice channel for me to join!");
                 }
             }
         }
@@ -61,7 +68,11 @@ public class Program
         {
             var random = new Random();
             int result = random.Next(1, 101);
-            await message.Channel.SendMessageAsync($"Выпало число: {result}");
+            await message.Channel.SendMessageAsync($"Rolled a number: {result}");
+        }
+        else if (message.Content == "!help")
+        {
+            await message.Channel.SendMessageAsync("Available commands: !join - join a voice channel, !roll - generate a random number.");
         }
     }
 }
