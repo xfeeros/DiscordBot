@@ -30,7 +30,7 @@ namespace DiscordBot.src
             // Command handler
             slash.RegisterCommands<CommandManager>((ulong)Decimal.Parse(guild));
 
-            // client.VoiceStateUpdated += VoiceServer;
+            client.VoiceStateUpdated += VoiceServer;
             // client.VoiceStateUpdated += VoiceServer;
             
 
@@ -40,16 +40,22 @@ namespace DiscordBot.src
             await Task.Delay(-1);
         }
 
-        /*
+        
         private static async Task VoiceServer(DiscordClient client, VoiceStateUpdateEventArgs ev)
         {
-            Console.WriteLine(ev.Before.ToString());
+            Console.WriteLine(ev.SessionId.ToString());
 
-
-
-            await client.ConnectAsync();
-            await Task.Delay(-1);
+            if (ev.Before == null)
+            {
+                Console.WriteLine("User: "+ ev.After.User.Username);
+                Console.WriteLine("Channel: " + ev.After.Channel.Name);
+            } else
+            {
+                Console.WriteLine("User: " + ev.Before.User.Username);
+                Console.WriteLine("Channel: " + ev.Before.Channel.Name);
+            }
+                      
         }
-        */
+        
     }
 }
