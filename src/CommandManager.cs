@@ -7,11 +7,11 @@ using DSharpPlus.SlashCommands;
 
 public class CommandManager : ApplicationCommandModule
 {
-    [SlashCommand("пинг", "базированная команда")]
+    [SlashCommand("РїРёРЅРі", "Р±Р°Р·РёСЂРѕРІР°РЅРЅР°СЏ РєРѕРјР°РЅРґР°")]
     public async Task DelayTestCommand(InteractionContext ctx)
     {
         await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Понг."));
+        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("РџРѕРЅРі."));
     }
 }
